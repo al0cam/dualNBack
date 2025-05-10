@@ -1,47 +1,112 @@
-# Svelte + TS + Vite
+# Dual N Back
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+A cognitive training game built with **Svelte 5**, styled using **Tailwind CSS** and **DaisyUI**.
+The Dual N-Back task is a neuroscience-based game that challenges your **working memory** by requiring players to remember both visual and auditory sequences over time.
 
-## Recommended IDE Setup
+---
 
-[VS Code](https://code.visualstudio.com/) + [Svelte](https://marketplace.visualstudio.com/items?itemName=svelte.svelte-vscode).
+## What is Dual N-Back?
 
-## Need an official Svelte framework?
+Dual N-Back is a psychological task used to improve working memory and fluid intelligence.
+You’re presented with a **sequence of visual and auditory stimuli**, and your goal is to recall if the **current stimulus matches the one from N steps earlier**.
 
-Check out [SvelteKit](https://github.com/sveltejs/kit#readme), which is also powered by Vite. Deploy anywhere with its serverless-first approach and adapt to various platforms, with out of the box support for TypeScript, SCSS, and Less, and easily-added support for mdsvex, GraphQL, PostCSS, Tailwind CSS, and more.
+For example:
 
-## Technical considerations
+* **Visual**: A square appears in one of 8 positions.
+* **Auditory**: A letter is played through audio.
 
-**Why use this over SvelteKit?**
+If either matches what appeared **N items ago**, you must respond by pressing the appropriate key.
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
+---
 
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+## Getting Started
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+### Prerequisites
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+Make sure you have **Node.js (>=18)** and **npm** installed.
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
+### Installation
 
-**Why include `.vscode/extensions.json`?**
-
-Other templates indirectly recommend extensions via the README, but this file allows VS Code to prompt the user to install the recommended extension upon opening the project.
-
-**Why enable `allowJs` in the TS template?**
-
-While `allowJs: false` would indeed prevent the use of `.js` files in the project, it does not prevent the use of JavaScript syntax in `.svelte` files. In addition, it would force `checkJs: false`, bringing the worst of both worlds: not being able to guarantee the entire codebase is TypeScript, and also having worse typechecking for the existing JavaScript. In addition, there are valid use cases in which a mixed codebase may be relevant.
-
-**Why is HMR not preserving my local component state?**
-
-HMR state preservation comes with a number of gotchas! It has been disabled by default in both `svelte-hmr` and `@sveltejs/vite-plugin-svelte` due to its often surprising behavior. You can read the details [here](https://github.com/rixo/svelte-hmr#svelte-hmr).
-
-If you have state that's important to retain within a component, consider creating an external store which would not be replaced by HMR.
-
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
+```bash
+git clone https://github.com/your-username/your-repo.git
+cd your-repo
+npm install
 ```
+
+### Development Server
+
+```bash
+npm run dev
+```
+
+Then open [http://localhost:5173](http://localhost:5173) in your browser.
+
+### Build for Production
+
+```bash
+npm run build
+```
+
+---
+
+## Tech Stack
+
+* **Svelte 5** (with `svelte:head`, `@html`, and new runes features)
+* **Tailwind CSS** for utility-first styling
+* **DaisyUI** for pre-styled components and themes
+* Vite for lightning-fast bundling
+
+---
+
+## Contribution Guide
+
+If you'd like to contribute to this project, here's how you can do it:
+
+1. **Fork** the repository.
+2. **Clone** your fork:
+
+   ```bash
+   git clone https://github.com/your-username/your-fork.git
+   ```
+3. **Create a branch** for your feature or fix:
+
+   ```bash
+   git checkout -b feature/your-feature-name
+   ```
+4. **Make your changes**, and ensure it works with `npm run dev`.
+5. **Commit your changes** with clear messages.
+6. **Push to your fork**:
+
+   ```bash
+   git push origin feature/your-feature-name
+   ```
+7. **Create a Pull Request** explaining what your change does and why.
+
+Thank you for contributing!
+
+---
+
+## Requesting Features and Reporting Issues
+
+If you want to request a feature or report an issue, please do so by creating an issue in the [Issues tab](../../issues).
+If you need to reach out directly, my email and LinkedIn can be found on my [GitHub profile](../../).
+
+---
+
+## Roadmap
+### Required for 1.0.0
+- [ ] Game logic
+- [ ] Sounds
+- [ ] Settings Modal
+- [ ] Icons
+
+### After 1.0.0
+- [ ] Maybe some form  of statistics over time
+- [ ] Reactive
+- [ ] Button instant feedback if the response was correct or not
+- [ ] Button pulse animation
+
+
+### Mobile release
+- [ ] Install Capacitor
+
