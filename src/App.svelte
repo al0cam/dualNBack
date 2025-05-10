@@ -1,72 +1,88 @@
-<script>
-  // Grid configuration
-  let gridSize = 3; // 3x3 grid by default
-  let activeCell = null; // Track the currently active cell
+<script lang="ts">
+  import { onDestroy, onMount } from "svelte";
+  import GridItem from "./components/GridItem.svelte";
+  import settings from "./models/Settings.svelte";
+  import gameState from "./models/GameState.svelte";
 
-  // Generate the grid cells
-  $: gridCells = Array.from({ length: gridSize * gridSize }, (_, i) => ({
-    id: i,
-    row: Math.floor(i / gridSize),
-    col: i % gridSize,
-  }));
+  onMount(() => {
+    window.addEventListener("keydown", keyPressed);
+  });
+  onDestroy(() => {
+    window.removeEventListener("keydown", keyPressed);
+  });
 
-  // Reactive variable for tracking the grid layout
-  $: gridTemplateColumns = `repeat(${gridSize}, minmax(0, 1fr))`;
+  let visualStiumulusButton: HTMLButtonElement;
+  let auditoryStiumulusButton: HTMLButtonElement;
 
-  // Function to highlight a cell (will be used in the N-Back logic later)
-  function highlightCell(cellId) {
-    activeCell = cellId;
+  function keyPressed(event: KeyboardEvent) {
+    if (
+      event.key.toUpperCase() ===
+      settings.visualStimulusKeyBinding.toUpperCase()
+    ) {
+      event.preventDefault();
+      visualStiumulusButton.click();
+    } else if (
+      event.key.toUpperCase() ===
+      settings.auditoryStimulusKeyBinding.toUpperCase()
+    ) {
+      event.preventDefault();
+      auditoryStiumulusButton.click();
+    }
+  }
+
+  function visualStimulus() {
+    visualStiumulusButton.classList.add("bg-green-500", "animate-ping");
+    console.log("Visual Stimulus");
     setTimeout(() => {
-      activeCell = null;
-    }, 500); // Clear highlight after 500ms
+      visualStiumulusButton.classList.remove("bg-green-500", "animate-ping");
+    }, 1000);
+  }
+  function auditoryStimulus() {
+    auditoryStiumulusButton.classList.add("bg-green-500", "animate-ping");
+    console.log("Auditory Stimulus");
+    setTimeout(() => {
+      auditoryStiumulusButton.classList.remove("bg-green-500", "animate-ping");
+    }, 1000);
   }
 </script>
 
 <main
-  class="flex flex-col items-center justify-center min-h-screen bg-base-200 p-4"
+  class="flex flex-col items-center justify-center min-h-screen h-screen bg-base-200 p-4"
 >
-  <div class="card bg-base-100 shadow-xl">
-    <div class="card-body">
-      <h1 class="card-title text-center mb-6">Dual N-Back Game</h1>
-
-      <!-- Controls will go here later -->
-      <div class="mb-4 flex gap-2">
-        <button class="btn btn-primary">Start</button>
-        <select class="select select-bordered">
-          <option value="2">2-Back</option>
-          <option value="3">3-Back</option>
-          <option value="4">4-Back</option>
-        </select>
-      </div>
-
-      <!-- Main Grid -->
-      <div
-        class="grid gap-2 w-full max-w-md mx-auto aspect-square"
-        style="grid-template-columns: {gridTemplateColumns};"
-      >
-        {#each gridCells as cell}
-          <div
-            class="bg-base-300 rounded-lg flex items-center justify-center transition-colors duration-200 shadow-sm hover:bg-base-200"
-            class:bg-primary={activeCell === cell.id}
-            class:text-primary-content={activeCell === cell.id}
-          ></div>
-        {/each}
-      </div>
-
-      <!-- Audio indicator will go here -->
-      <div class="mt-6 text-center text-xl font-bold h-8">
-        <!-- Audio stimulus display here -->
-      </div>
-
-      <!-- Response buttons will go here -->
-      <div class="mt-4 flex justify-center gap-4">
-        <button class="btn">Position Match (A)</button>
-        <button class="btn">Audio Match (L)</button>
-      </div>
-    </div>
+  <h1 class="text-3xl font-bold mb-4">Dual N back</h1>
+  <div class="grid grid-cols-3 grid-rows-3 gap-4 h-9/10">
+    {#each { length: 9 }, item}
+      {#if item == 4}
+        <div class="flex flex-col items-center justify-center gap-3 text-3xl">
+          <span>N = {gameState.nBackLevel}</span>
+          <span>{gameState.currentTrial}/{gameState.trialNumber}</span>
+          <button class="btn btn-primary text-3xl">
+            {gameState.isGameStarted ? "Restart" : "Start"}
+          </button>
+        </div>
+      {:else}
+        <GridItem />
+      {/if}
+    {/each}
+  </div>
+  <div class="flex justify-center mt-4 gap-4 h-1/10">
+    <button
+      class="btn btn-primary w-md h-auto text-3xl"
+      bind:this={visualStiumulusButton}
+      onclick={() => {
+        visualStimulus();
+      }}
+    >
+      Visual Stimulus ({settings.visualStimulusKeyBinding.toUpperCase()})</button
+    >
+    <button
+      class="btn btn-primary active:bg-green-500 w-md h-auto text-3xl"
+      bind:this={auditoryStiumulusButton}
+      onclick={() => {
+        auditoryStimulus();
+      }}
+    >
+      Auditory Stimulus ({settings.auditoryStimulusKeyBinding.toUpperCase()})</button
+    >
   </div>
 </main>
-
-<style>
-  /* Additional styles if needed beyond Tailwind */
-</style>
