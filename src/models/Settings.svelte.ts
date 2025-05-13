@@ -5,8 +5,7 @@ class Settings {
   visualStimulusKeyBinding: string = $state("a");
   auditoryStimulusKeyBinding: string = $state("l");
 
-  private constructor() {
-  }
+  private constructor() { }
 
   public static getInstance(): Settings {
     if (!Settings.instance) {
@@ -14,9 +13,6 @@ class Settings {
     }
     return Settings.instance;
   }
-
-
-
 }
 
 const settings = Settings.getInstance();

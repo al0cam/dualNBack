@@ -3,6 +3,7 @@
   import GridItem from "./components/GridItem.svelte";
   import settings from "./models/Settings.svelte";
   import gameState from "./models/GameState.svelte";
+  import gameLogic from "./logic/GameLogic.svelte";
 
   onMount(() => {
     window.addEventListener("keydown", keyPressed);
@@ -44,6 +45,8 @@
       auditoryStiumulusButton.classList.remove("bg-green-500", "animate-ping");
     }, 1000);
   }
+
+  gameLogic.startGame();
 </script>
 
 <main
@@ -57,7 +60,7 @@
           <span>N = {gameState.nBackLevel}</span>
           <span>{gameState.currentTrial}/{gameState.trialNumber}</span>
           <button class="btn btn-primary text-3xl">
-            {gameState.isGameStarted ? "Restart" : "Start"}
+            {gameState.isGameStarted ? "Stop" : "Start"}
           </button>
         </div>
       {:else}
