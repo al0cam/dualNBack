@@ -1,6 +1,5 @@
 import gameState from "../models/GameState.svelte";
 import type { MatchCounts } from "../types/MatchCounts";
-import type { MatchType } from "../types/MatchType";
 import type { Stimulus } from "../types/Stimulus";
 
 class GameLogic {
@@ -41,154 +40,39 @@ class GameLogic {
    * @returns {Stimulus[]} - The generated sequence of stimuli
    */
   public generateStimuliSequence(): Stimulus[] {
-    const matchCounts: MatchCounts = this.calculateMatchCounts();
-    let sequence: Stimulus[] = [];
-
-    sequence = this.generateInitialStimuli();
-    sequence = this.generateRemainingStimuli(sequence, matchCounts);
-    sequence = this.balanceSequence(sequence);
-
-    return sequence;
-  }
-
-  /**
-   * Calculate the number of matches based on n-back level and match percentage
-   *
-   * @returns {MatchCounts} - The calculated match counts for position and audio
-   */
-  private calculateMatchCounts(): MatchCounts {
     gameState.trialNumber = Math.ceil(
       gameState.defaultTrialNumber + gameState.nBackLevel ** 2,
     );
     gameState.matches = Math.floor(
       gameState.trialNumber * gameState.matchPercentage,
     );
+    let sequence: Stimulus[] = [];
 
-    return {
-      position: gameState.matches,
-      audio: gameState.matches,
-    };
+    sequence = this.generateRandomSequence(gameState.trialNumber);
+    sequence = this.balanceSequence(sequence);
+
+    return sequence;
   }
 
   /**
-   * Generate the initial stimuli sequence
+   * Generate a random sequence of stimuli
    *
-   * @returns {Stimulus[]} - The initial sequence of stimuli
+   * @param trialNumber - Number of trials to generate
+   * @returns {Stimulus[]} - The generated sequence of stimuli
    */
-  private generateInitialStimuli(): Stimulus[] {
+  private generateRandomSequence(trialNumber: number): Stimulus[] {
     const sequence: Stimulus[] = [];
 
-    for (let i = 0; i < gameState.nBackLevel; i++) {
+    for (let i = 0; i < trialNumber; i++) {
+      const position = this.getRandomPosition();
+      const letter = this.getRandomLetter();
       sequence.push({
-        position: this.getRandomPosition(),
-        letter: this.getRandomLetter(),
+        position,
+        letter,
       });
     }
 
     return sequence;
-  }
-
-  // Generate remaining stimuli with appropriate matches
-  private generateRemainingStimuli(
-    sequence: Stimulus[],
-    matchCounts: MatchCounts,
-  ): Stimulus[] {
-    const n = gameState.nBackLevel;
-    const trials = gameState.trialNumber;
-
-    const remaining = { ...matchCounts };
-
-    for (let i = n; i < trials; i++) {
-      const previousTrial = sequence[i - n];
-
-      const stimulus = this.generateStimulus(previousTrial, matchType);
-      sequence.push(stimulus);
-
-      if (matchType === "position") {
-        remaining.position--;
-      } else if (matchType === "audio") {
-        remaining.audio--;
-      }
-    }
-    return sequence;
-  }
-
-  /**
-   * Generate a stimulus based on the previous one and match type
-   *
-   * @param previous - Previous stimulus
-   * @param matchType - Type of match to generate
-   * @return - New stimulus
-   */
-  private generateStimulus(previous: Stimulus, matchType: MatchType): Stimulus {
-    switch (matchType) {
-      case "position":
-        return {
-          position: previous.position,
-          letter: this.getDifferentLetter(previous.letter),
-        };
-      case "audio":
-        return {
-          position: this.getDifferentPosition(previous.position),
-          letter: previous.letter,
-        };
-      default:
-        return {
-          position: this.getDifferentPosition(previous.position),
-          letter: this.getDifferentLetter(previous.letter),
-        };
-    }
-  }
-
-  /**
-   * Get a random position different from the current one
-   *
-   * @param currentPosition - Current position
-   * @return - New position
-   */
-  private getDifferentPosition(currentPosition: number): number {
-    let newPosition;
-    do {
-      newPosition = this.getRandomPosition();
-    } while (newPosition === currentPosition);
-
-    return newPosition;
-  }
-
-  /**
-   * Get a random letter different from the current one
-   *
-   * @param currentLetter - Current letter
-   * @return - New letter
-   */
-  private getDifferentLetter(currentLetter: string): string {
-    let newLetter;
-    do {
-      newLetter = this.getRandomLetter();
-    } while (newLetter === currentLetter);
-
-    return newLetter;
-  }
-
-  /**
-   * Select a random item based on weighted probabilities
-   *
-   * @param items - Array of items to choose from
-   * @param weights - Corresponding weights for each item
-   * @return - Selected item
-   */
-  private weightedRandomSelect<T>(items: T[], weights: number[]): T {
-    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0);
-    let random = Math.random() * totalWeight;
-
-    for (let i = 0; i < items.length; i++) {
-      if (random < weights[i]) {
-        return items[i];
-      }
-      random -= weights[i];
-    }
-
-    return items[items.length - 1]; // Fallback
   }
 
   // Validate and balance the sequence
@@ -235,6 +119,36 @@ class GameLogic {
   private getRandomPosition(): number {
     const randomIndex = this.getRandomInt(0, this.VALID_POSITIONS.length - 1);
     return this.VALID_POSITIONS[randomIndex];
+  }
+
+  /**
+   * Get a random position different from the current one
+   *
+   * @param currentPosition - Current position
+   * @return - New position
+   */
+  private getDifferentPosition(currentPosition: number): number {
+    let newPosition;
+    do {
+      newPosition = this.getRandomPosition();
+    } while (newPosition === currentPosition);
+
+    return newPosition;
+  }
+
+  /**
+   * Get a random letter different from the current one
+   *
+   * @param currentLetter - Current letter
+   * @return - New letter
+   */
+  private getDifferentLetter(currentLetter: string): string {
+    let newLetter;
+    do {
+      newLetter = this.getRandomLetter();
+    } while (newLetter === currentLetter);
+
+    return newLetter;
   }
 
   /**
