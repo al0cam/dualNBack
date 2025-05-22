@@ -1,9 +1,33 @@
-import gameState from "../models/GameState.svelte";
-import type { MatchCounts } from "../types/MatchCounts";
+import type { StimuliSequence } from "../types/StimuliSequence";
 import type { Stimulus } from "../types/Stimulus";
 
 class GameLogic {
   private static instance: GameLogic;
+
+  stimuliDuration: number = $state(500);
+  pauseBetweenStimuli: number = $state(2500);
+
+  nBackLevel: number = $state(2);
+  currentSet = $state(0);
+  setNumber: number = $state(20);
+  trialNumber: number = $state(0);
+  matches: number = $state(6);
+  randomness: number = $state(0.35);
+  // derived from reference [1]
+  lettersUsed: string[] = $state([
+    "b",
+    "c",
+    "d",
+    "g",
+    "h",
+    "k",
+    "p",
+    "q",
+    "t",
+    "w",
+  ]);
+
+  isGameStarted: boolean = $state(false);
 
   // Define the valid positions (excluding center)
   private readonly VALID_POSITIONS: number[] = [0, 1, 2, 3, 5, 6, 7, 8];
@@ -20,95 +44,134 @@ class GameLogic {
   /**
    * Start the game by generating the stimuli sequence
    */
-  public startGame() {
-    const sequence = this.generateStimuliSequence();
+  public startGame(gridItems: HTMLElement[]): void {
+    console.log("Starting game...");
+    this.trialNumber = Math.ceil(
+      (this.nBackLevel + this.matches) / this.randomness,
+    );
+    const stimuliSequence = this.generateMatchIndices(
+      this.trialNumber,
+      this.matches,
+      this.nBackLevel,
+    );
+    // console.log(stimuliSequence);
+
+    const sequence = this.generateStimulusSequence(
+      this.trialNumber,
+      this.nBackLevel,
+      stimuliSequence,
+    );
+
+    // console.log(sequence);
+    // this.printSequence(sequence, stimuliSequence);
+
     // Reset current trial
-    gameState.currentTrial = 0;
-    gameState.isGameStarted = true;
+    this.isGameStarted = true;
   }
 
   /**
    * End the game and reset the game state
    */
-  public endGame() {
-    gameState.isGameStarted = false;
+  public stopGame() {
+    this.isGameStarted = false;
   }
 
   /**
-   * Generate the stimuli sequence based on n-back level and match percentage
+   * Generate a sequence of stimuli based on the n-back level and match indices
    *
-   * @returns {Stimulus[]} - The generated sequence of stimuli
+   * @param trialNumber - Number of trials
+   * @param nBack - The n-back level
+   * @param stimuliSequence - The sequence of match indices
+   * @return {Stimulus[]} - The generated sequence of stimuli
    */
-  public generateStimuliSequence(): Stimulus[] {
-    gameState.trialNumber = Math.ceil(
-      gameState.defaultTrialNumber + gameState.nBackLevel ** 2,
-    );
-    gameState.matches = Math.floor(
-      gameState.trialNumber * gameState.matchPercentage,
-    );
-    let sequence: Stimulus[] = [];
-
-    sequence = this.generateRandomSequence(gameState.trialNumber);
-    sequence = this.balanceSequence(sequence);
-
-    return sequence;
-  }
-
-  /**
-   * Generate a random sequence of stimuli
-   *
-   * @param trialNumber - Number of trials to generate
-   * @returns {Stimulus[]} - The generated sequence of stimuli
-   */
-  private generateRandomSequence(trialNumber: number): Stimulus[] {
+  generateStimulusSequence(
+    trialNumber: number,
+    nBack: number,
+    stimuliSequence: StimuliSequence,
+  ): Stimulus[] {
     const sequence: Stimulus[] = [];
 
     for (let i = 0; i < trialNumber; i++) {
-      const position = this.getRandomPosition();
-      const letter = this.getRandomLetter();
-      sequence.push({
-        position,
-        letter,
-      });
+      const isAudioMatch = stimuliSequence.LetterMatchIndices.includes(i);
+      const isVisualMatch = stimuliSequence.PositionMatchIndices.includes(i);
+
+      let letter: string;
+      let position: number;
+
+      if (isAudioMatch) {
+        // Force audio match to n-back
+        letter = sequence[i - nBack].letter;
+      } else if (i >= nBack) {
+        // Ensure no accidental match
+        letter = this.getDifferentLetter(sequence[i - nBack].letter);
+      } else {
+        // Random before N
+        letter = this.getRandomLetter();
+      }
+
+      if (isVisualMatch) {
+        position = sequence[i - nBack].position;
+      } else if (i >= nBack) {
+        position = this.getDifferentPosition(sequence[i - nBack].position);
+      } else {
+        position = this.getRandomPosition();
+      }
+
+      sequence.push({ letter, position });
     }
 
     return sequence;
   }
 
-  // Validate and balance the sequence
-  private balanceSequence(sequence: Stimulus[]): Stimulus[] {
-    const n = gameState.nBackLevel;
+  /**
+   * Generate match indices for the letter and position matches
+   *
+   * @param trialNumber - Number of trials
+   * @param matches - Number of matches
+   * @param nBack - The n-back level
+   * @param minSpacing - Minimum gap between match indices
+   * @returns {StimuliSequence} - The generated match indices
+   */
+  generateMatchIndices(
+    trialNumber: number,
+    matches: number,
+    nBack: number,
+    minSpacing = 2, // minimum gap between match indices
+  ): StimuliSequence {
+    function getMatchIndices(): number[] {
+      const indices: number[] = [];
+      const available: number[] = [];
 
-    // Check for accidental patterns and correct them
-    for (let i = n; i < sequence.length; i++) {
-      // Check for three consecutive position matches
-      if (
-        i >= n + 1 &&
-        sequence[i].position === sequence[i - n].position &&
-        sequence[i - n].position === sequence[i - n - 1].position
-      ) {
-        sequence[i].position = this.getDifferentPosition(sequence[i].position);
+      for (let i = nBack; i < trialNumber; i++) {
+        available.push(i);
       }
 
-      // Check for three consecutive letter matches
-      if (
-        i >= n + 1 &&
-        sequence[i].letter === sequence[i - n].letter &&
-        sequence[i - n].letter === sequence[i - n - 1].letter
-      ) {
-        sequence[i].letter = this.getDifferentLetter(sequence[i].letter);
-      }
-    }
-    return sequence;
-  }
+      while (indices.length < matches && available.length > 0) {
+        // Choose a random index from what's left
+        const randomIdx = Math.floor(Math.random() * available.length);
+        const chosen = available[randomIdx];
+        indices.push(chosen);
 
-  // Get the current stimulus based on the current trial
-  public getCurrentStimulus(sequence: Stimulus[]): Stimulus | null {
-    const currentTrial = gameState.currentTrial;
-    if (currentTrial >= 0 && currentTrial < sequence.length) {
-      return sequence[currentTrial];
+        for (let offset = -minSpacing; offset <= minSpacing; offset++) {
+          const toRemove = chosen + offset;
+          const removeIndex = available.indexOf(toRemove);
+          if (removeIndex !== -1) {
+            available.splice(removeIndex, 1);
+          }
+        }
+      }
+      if (indices.length < matches) {
+        // If we couldn't find enough indices, try again
+        return getMatchIndices();
+      }
+
+      return indices;
     }
-    return null;
+
+    return {
+      LetterMatchIndices: getMatchIndices(),
+      PositionMatchIndices: getMatchIndices(),
+    };
   }
 
   /**
@@ -128,12 +191,22 @@ class GameLogic {
    * @return - New position
    */
   private getDifferentPosition(currentPosition: number): number {
-    let newPosition;
+    let newPosition: number;
     do {
       newPosition = this.getRandomPosition();
     } while (newPosition === currentPosition);
 
     return newPosition;
+  }
+
+  /**
+   * Generate a random letter from the available letters
+   *
+   * @returns {string} - Random letter
+   */
+  private getRandomLetter(): string {
+    const letters = this.lettersUsed;
+    return letters[this.getRandomInt(0, letters.length - 1)];
   }
 
   /**
@@ -143,22 +216,12 @@ class GameLogic {
    * @return - New letter
    */
   private getDifferentLetter(currentLetter: string): string {
-    let newLetter;
+    let newLetter: string;
     do {
       newLetter = this.getRandomLetter();
     } while (newLetter === currentLetter);
 
     return newLetter;
-  }
-
-  /**
-   * Generate a random letter from the available letters
-   *
-   * @returns {string} - Random letter
-   */
-  private getRandomLetter(): string {
-    const letters = gameState.lettersUsed;
-    return letters[this.getRandomInt(0, letters.length - 1)];
   }
 
   /*
@@ -171,41 +234,101 @@ class GameLogic {
     return Math.floor(Math.random() * (max - min + 1)) + min;
   }
 
-  // Check if the current position matches n-back position
-  public isPositionMatch(sequence: Stimulus[]): boolean {
-    const n = gameState.nBackLevel;
-    const currentTrial = gameState.currentTrial;
-
-    if (currentTrial < n || currentTrial >= sequence.length) {
+  /**
+   * Check if the current position matches the letter n-back
+   *
+   * @param sequence - The sequence of stimuli
+   * @param nBack - The n-back level
+   * @param currentTrial - The current trial index
+   * @return {boolean} - True if the letters match, false otherwise
+   */
+  public isPositionMatch(
+    sequence: Stimulus[],
+    nBack: number,
+    currentTrial: number,
+  ): boolean {
+    if (currentTrial < nBack || currentTrial >= sequence.length) {
       return false;
     }
 
     return (
-      sequence[currentTrial].position === sequence[currentTrial - n].position
+      sequence[currentTrial].position ===
+      sequence[currentTrial - nBack].position
     );
   }
 
-  // Check if the current letter matches n-back letter
-  public isLetterMatch(sequence: Stimulus[]): boolean {
-    const n = gameState.nBackLevel;
-    const currentTrial = gameState.currentTrial;
-
-    if (currentTrial < n || currentTrial >= sequence.length) {
+  /**
+   * Check if the current letter matches n-back letter
+   *
+   * @param sequence - The sequence of stimuli
+   * @param nBack - The n-back level
+   * @param currentTrial - The current trial index
+   * @return {boolean} - True if the letters match, false otherwise
+   */
+  public isLetterMatch(
+    sequence: Stimulus[],
+    nBack: number,
+    currentTrial: number,
+  ): boolean {
+    if (currentTrial < nBack || currentTrial >= sequence.length) {
       return false;
     }
 
-    return sequence[currentTrial].letter === sequence[currentTrial - n].letter;
+    return (
+      sequence[currentTrial].letter === sequence[currentTrial - nBack].letter
+    );
   }
 
-  // Advance to the next trial
-  public nextTrial(sequence: Stimulus[]): boolean {
-    gameState.currentTrial++;
-    return gameState.currentTrial < sequence.length;
-  }
-
-  // Helper method to convert a position index (0-7) to grid position (0-8 skipping 4)
+  /**
+   * Convert a position to a grid index
+   *
+   * @param position - The position to convert
+   * @return {number} - The grid index
+   */
   public positionToGridIndex(position: number): number {
     return this.VALID_POSITIONS[position % this.VALID_POSITIONS.length];
+  }
+
+  /**
+   * Print the sequence of stimuli to the console
+   *
+   * @param sequence - The sequence of stimuli
+   * @param stimuliSequence - The sequence of match indices
+   * @return {void}
+   */
+  printSequence(sequence: Stimulus[], stimuliSequence: StimuliSequence): void {
+    let string = "";
+    for (let i = 0; i < sequence.length; i++) {
+      if (stimuliSequence.LetterMatchIndices.includes(i)) {
+        string += `${sequence[i].letter.toUpperCase()} `;
+      } else {
+        string += `${sequence[i].letter} `;
+      }
+    }
+    console.log(string);
+  }
+
+  async runSequence(
+    sequence: Stimulus[],
+    gridItems: HTMLElement[],
+    stimuliDuration: number,
+    pauseBetweenStimuli: number,
+  ) {
+    for (let i = 0; i < sequence.length; i++) {
+      const gridIndex = this.positionToGridIndex(sequence[i].position);
+
+      // Show the stimulus
+      gridItems[gridIndex].classList.add("bg-orange-500");
+      await new Promise((resolve) => setTimeout(resolve, stimuliDuration));
+
+      // Hide the stimulus
+      gridItems[gridIndex].classList.remove("bg-orange-500");
+      if (i < sequence.length - 1) {
+        await new Promise((resolve) =>
+          setTimeout(resolve, pauseBetweenStimuli),
+        );
+      }
+    }
   }
 }
 
