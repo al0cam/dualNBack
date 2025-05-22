@@ -101,7 +101,8 @@ If you need to reach out directly, my email and LinkedIn can be found on my [Git
 - [ ] Icons
 
 ### After 1.0.0
-- [ ] Maybe some form  of statistics over time
+- [ ] Maybe some form of statistics over time
+- [ ] Refine Randomness and sequences
 - [ ] Reactive
 - [ ] Button instant feedback if the response was correct or not
 - [ ] Button pulse animation
@@ -109,4 +110,10 @@ If you need to reach out directly, my email and LinkedIn can be found on my [Git
 
 ### Mobile release
 - [ ] Install Capacitor
+
+---
+
+# References
+
+[1] S. M. Jaeggi et al., “Does excessive memory load attenuate activation in the prefrontal cortex? Load-dependent processing in single and dual tasks: functional magnetic resonance imaging study,” NeuroImage, vol. 19, no. 2, pp. 210–225, Jun. 2003, doi: 10.1016/S1053-8119(03)00098-3.
 
