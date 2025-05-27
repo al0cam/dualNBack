@@ -29,10 +29,12 @@ class GameLogic {
 
   isGameStarted: boolean = $state(false);
 
+  abortController: AbortController = new AbortController();
+
   // Define the valid positions (excluding center)
   private readonly VALID_POSITIONS: number[] = [0, 1, 2, 3, 5, 6, 7, 8];
 
-  private constructor() { }
+  private constructor() {}
 
   public static getInstance(): GameLogic {
     if (!GameLogic.instance) {
@@ -64,7 +66,13 @@ class GameLogic {
 
     // console.log(sequence);
     // this.printSequence(sequence, stimuliSequence);
-
+    this.runSequence(
+      sequence,
+      gridItems,
+      this.stimuliDuration,
+      this.pauseBetweenStimuli,
+      this.abortController,
+    );
     // Reset current trial
     this.isGameStarted = true;
   }
@@ -73,6 +81,8 @@ class GameLogic {
    * End the game and reset the game state
    */
   public stopGame() {
+    console.log("Stopping game...");
+    this.abortController.abort();
     this.isGameStarted = false;
   }
 
@@ -308,25 +318,60 @@ class GameLogic {
     console.log(string);
   }
 
+  /**
+   * Wait for a specified duration or until the signal is aborted
+   *
+   * @param ms - Duration in milliseconds
+   * @param signal - Abort signal to cancel the wait
+   * @return {Promise<void>}
+   */
+  wait(ms: number, signal?: AbortSignal): Promise<void> {
+    return new Promise((resolve) => {
+      const id = setTimeout(() => {
+        signal?.removeEventListener("abort", onAbort);
+        resolve();
+      }, ms);
+
+      const onAbort = () => {
+        clearTimeout(id);
+      };
+
+      if (signal?.aborted) {
+        onAbort();
+      } else {
+        signal?.addEventListener("abort", onAbort);
+      }
+    });
+  }
+
+  /**
+   * Run the sequence of stimuli
+   *
+   * @param sequence - The sequence of stimuli
+   * @param gridItems - The grid items to highlight
+   * @param stimuliDuration - Duration for each stimulus
+   * @param pauseBetweenStimuli - Pause duration between stimuli
+   * @param abortController - Abort controller to handle cancellation
+   * @return {Promise<void>}
+   */
   async runSequence(
     sequence: Stimulus[],
     gridItems: HTMLElement[],
     stimuliDuration: number,
     pauseBetweenStimuli: number,
-  ) {
+    abortController: AbortController,
+  ): Promise<void> {
+    await this.wait(1000, abortController.signal); // Initial wait before starting the sequence
     for (let i = 0; i < sequence.length; i++) {
+      console.log("Step:", i);
       const gridIndex = this.positionToGridIndex(sequence[i].position);
 
-      // Show the stimulus
       gridItems[gridIndex].classList.add("bg-orange-500");
-      await new Promise((resolve) => setTimeout(resolve, stimuliDuration));
+      await this.wait(stimuliDuration, abortController.signal);
 
-      // Hide the stimulus
       gridItems[gridIndex].classList.remove("bg-orange-500");
       if (i < sequence.length - 1) {
-        await new Promise((resolve) =>
-          setTimeout(resolve, pauseBetweenStimuli),
-        );
+        await this.wait(pauseBetweenStimuli, abortController.signal);
       }
     }
   }

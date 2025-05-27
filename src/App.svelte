@@ -1,61 +1,59 @@
 <script lang="ts">
-import { onDestroy, onMount } from "svelte";
-import GridItem from "./components/GridItem.svelte";
-import settings from "./models/Settings.svelte";
-import gameLogic from "./logic/GameLogic.svelte";
+  import { onDestroy, onMount } from "svelte";
+  import GridItem from "./components/GridItem.svelte";
+  import settings from "./models/Settings.svelte";
+  import gameLogic from "./logic/GameLogic.svelte";
 
-onMount(() => {
-  window.addEventListener("keydown", keyPressed);
-});
-onDestroy(() => {
-  window.removeEventListener("keydown", keyPressed);
-});
+  onMount(() => {
+    window.addEventListener("keydown", keyPressed);
+  });
+  onDestroy(() => {
+    window.removeEventListener("keydown", keyPressed);
+  });
 
-let visualStiumulusButton: HTMLButtonElement;
-let auditoryStiumulusButton: HTMLButtonElement;
-const gridItems = $state(Array(9).fill(null));
+  let visualStiumulusButton: HTMLButtonElement;
+  let auditoryStiumulusButton: HTMLButtonElement;
+  const gridItems = $state(Array(9).fill(null));
 
-function keyPressed(event: KeyboardEvent) {
-  if (
-    event.key.toUpperCase() === settings.visualStimulusKeyBinding.toUpperCase()
-  ) {
-    event.preventDefault();
-    visualStiumulusButton.click();
-  } else if (
-    event.key.toUpperCase() ===
-    settings.auditoryStimulusKeyBinding.toUpperCase()
-  ) {
-    event.preventDefault();
-    auditoryStiumulusButton.click();
+  function keyPressed(event: KeyboardEvent) {
+    if (
+      event.key.toUpperCase() ===
+      settings.visualStimulusKeyBinding.toUpperCase()
+    ) {
+      event.preventDefault();
+      visualStiumulusButton.click();
+    } else if (
+      event.key.toUpperCase() ===
+      settings.auditoryStimulusKeyBinding.toUpperCase()
+    ) {
+      event.preventDefault();
+      auditoryStiumulusButton.click();
+    }
   }
-}
 
-function visualStimulus() {
-  visualStiumulusButton.classList.add("bg-green-500", "animate-ping");
-  console.log("Visual Stimulus");
-  setTimeout(() => {
-    visualStiumulusButton.classList.remove("bg-green-500", "animate-ping");
-  }, 1000);
-}
-function auditoryStimulus() {
-  auditoryStiumulusButton.classList.add("bg-green-500", "animate-ping");
-  console.log("Auditory Stimulus");
-  setTimeout(() => {
-    auditoryStiumulusButton.classList.remove("bg-green-500", "animate-ping");
-  }, 1000);
-}
+  function visualStimulus() {
+    visualStiumulusButton.classList.add("bg-green-500", "animate-ping");
+    console.log("Visual Stimulus");
+    setTimeout(() => {
+      visualStiumulusButton.classList.remove("bg-green-500", "animate-ping");
+    }, 1000);
+  }
+  function auditoryStimulus() {
+    auditoryStiumulusButton.classList.add("bg-green-500", "animate-ping");
+    console.log("Auditory Stimulus");
+    setTimeout(() => {
+      auditoryStiumulusButton.classList.remove("bg-green-500", "animate-ping");
+    }, 1000);
+  }
 
-function startStop() {
-  gameLogic.isGameStarted = !gameLogic.isGameStarted;
-  for (let i = 0; i < gridItems.length; i++) {
-    console.log(typeof gridItems[i]);
+  function startStop() {
+    gameLogic.isGameStarted = !gameLogic.isGameStarted;
+    if (gameLogic.isGameStarted) {
+      gameLogic.startGame(gridItems);
+    } else {
+      gameLogic.stopGame();
+    }
   }
-  if (gameLogic.isGameStarted) {
-    gameLogic.startGame(gridItems);
-  } else {
-    gameLogic.stopGame();
-  }
-}
 </script>
 
 <main
