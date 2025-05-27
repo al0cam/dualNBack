@@ -96,7 +96,9 @@ If you need to reach out directly, my email and LinkedIn can be found on my [Git
 ## Roadmap
 ### Required for 1.0.0
 - [ ] Game logic
-- [ ] Sounds
+    - [x] Sequence generation
+    - [x] Visual stimuli
+    - [ ] Audio stimuli
 - [ ] Settings Modal
 - [ ] Icons
 
