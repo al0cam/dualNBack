@@ -1,6 +1,6 @@
 <script lang="ts">
 import { onDestroy, onMount } from "svelte";
-import SettingsIcon from "./assets/SettingsIcon.svelte";
+import SettingsIcon from "./assets/icons/SettingsIcon.svelte";
 import GridItem from "./components/GridItem.svelte";
 import SettingsDialog from "./components/SettingsDialog.svelte";
 import gameLogic from "./logic/GameLogic.svelte";
@@ -57,7 +57,7 @@ function startStop() {
   if (gameLogic.isGameStarted) {
     gameLogic.startGame(gridItems);
   } else {
-    gameLogic.stopGame();
+    gameLogic.stopGame(gridItems);
   }
 }
 </script>

@@ -34,7 +34,7 @@ class GameLogic {
   // Define the valid positions (excluding center)
   private readonly VALID_POSITIONS: number[] = [0, 1, 2, 3, 5, 6, 7, 8];
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): GameLogic {
     if (!GameLogic.instance) {
@@ -66,6 +66,9 @@ class GameLogic {
 
     // console.log(sequence);
     // this.printSequence(sequence, stimuliSequence);
+
+    // Reset current trial
+    this.isGameStarted = true;
     this.runSequence(
       sequence,
       gridItems,
@@ -73,17 +76,16 @@ class GameLogic {
       this.pauseBetweenStimuli,
       this.abortController,
     );
-    // Reset current trial
-    this.isGameStarted = true;
   }
 
   /**
    * End the game and reset the game state
    */
-  public stopGame() {
+  public stopGame(gridItems: HTMLElement[]): void {
     console.log("Stopping game...");
     this.abortController.abort();
     this.isGameStarted = false;
+    this.resetGrid(gridItems);
   }
 
   /**
@@ -326,6 +328,7 @@ class GameLogic {
    * @return {Promise<void>}
    */
   wait(ms: number, signal?: AbortSignal): Promise<void> {
+    console.log("Waiting for", ms, "ms");
     return new Promise((resolve) => {
       const id = setTimeout(() => {
         signal?.removeEventListener("abort", onAbort);
@@ -333,12 +336,18 @@ class GameLogic {
       }, ms);
 
       const onAbort = () => {
+        console.log("Aborted after", ms, "ms");
         clearTimeout(id);
+
+        // Reset the abort controller to allow for a new wait
+        this.abortController = new AbortController();
       };
 
       if (signal?.aborted) {
+        console.log("Aborted immediately");
         onAbort();
       } else {
+        console.log("Waiting for abort signal");
         signal?.addEventListener("abort", onAbort);
       }
     });
@@ -361,7 +370,10 @@ class GameLogic {
     pauseBetweenStimuli: number,
     abortController: AbortController,
   ): Promise<void> {
-    await this.wait(1000, abortController.signal); // Initial wait before starting the sequence
+    console.log("Running sequence...");
+
+    await this.wait(1000, abortController.signal);
+
     for (let i = 0; i < sequence.length; i++) {
       console.log("Step:", i);
       const gridIndex = this.positionToGridIndex(sequence[i].position);
@@ -374,6 +386,16 @@ class GameLogic {
         await this.wait(pauseBetweenStimuli, abortController.signal);
       }
     }
+  }
+
+  /**
+   * Reset the grid
+   */
+  resetGrid(gridItems: HTMLElement[]): void {
+    console.log("Resetting grid...");
+    gridItems.forEach((item) => {
+      item.classList.remove("bg-orange-500");
+    });
   }
 }
 

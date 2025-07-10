@@ -1,6 +1,6 @@
 <script lang="ts">
-import DarkIcon from "../assets/DarkIcon.svelte";
-import LightIcon from "../assets/LightIcon.svelte";
+import DarkIcon from "../assets/icons/DarkIcon.svelte";
+import LightIcon from "../assets/icons/LightIcon.svelte";
 import settings from "../models/Settings.svelte";
 
 let { settingsDialog = $bindable() } = $props();

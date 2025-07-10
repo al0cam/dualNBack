@@ -101,7 +101,8 @@ If you need to reach out directly, my email and LinkedIn can be found on my [Git
     - [ ] Audio stimuli
 - [ ] Settings Modal
 - [x] Icons
-- [ ] fix bug where the game doesn't display letters after it is stopped
+- [x] fix bug where the game doesn't display letters after it is stopped -> fixed by adding new AbortController
+- [x] grid reset on stop
 
 ### After 1.0.0
 - [ ] Maybe some form of statistics over time
