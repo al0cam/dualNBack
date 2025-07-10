@@ -1,11 +1,11 @@
 <script lang="ts">
-const letter = $state("F");
-interface Props {
-  class?: string;
-  elRef?: HTMLElement | null;
-}
+  const letter = $state("F");
+  interface Props {
+    class?: string;
+    elRef?: HTMLElement | null;
+  }
 
-let { class: _class = "", elRef = $bindable() }: Props = $props();
+  let { class: _class = "", elRef = $bindable() }: Props = $props();
 </script>
 
 <!-- <div class="flex items-center justify-center w-md h-md bg-base-100"> -->
@@ -21,7 +21,7 @@ let { class: _class = "", elRef = $bindable() }: Props = $props();
     _class,
   ]}
 >
-  <span class="text-[10dvh] font-bold">
+  <span class="text-[10dvh] text-base-content font-bold">
     {letter}
   </span>
 </div>

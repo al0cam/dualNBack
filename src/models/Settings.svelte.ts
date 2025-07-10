@@ -1,7 +1,7 @@
 class Settings {
   private static instance: Settings;
-  // App settings
-  theme: string = $state("light");
+
+  theme: string = $state("dracula");
   visualStimulusKeyBinding: string = $state("a");
   auditoryStimulusKeyBinding: string = $state("l");
 
@@ -12,6 +12,13 @@ class Settings {
       Settings.instance = new Settings();
     }
     return Settings.instance;
+  }
+
+  public toggleTheme() {
+    this.theme = this.theme === "cupcake" ? "dracula" : "cupcake";
+    console.log("Theme changed to:", this.theme);
+    document.documentElement.setAttribute("data-theme", this.theme);
+    localStorage.setItem("theme", this.theme);
   }
 }
 

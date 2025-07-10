@@ -100,7 +100,8 @@ If you need to reach out directly, my email and LinkedIn can be found on my [Git
     - [x] Visual stimuli
     - [ ] Audio stimuli
 - [ ] Settings Modal
-- [ ] Icons
+- [x] Icons
+- [ ] fix bug where the game doesn't display letters after it is stopped
 
 ### After 1.0.0
 - [ ] Maybe some form of statistics over time
