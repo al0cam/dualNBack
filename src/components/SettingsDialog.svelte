@@ -1,14 +1,19 @@
 <script lang="ts">
-import DarkIcon from "../assets/icons/DarkIcon.svelte";
-import LightIcon from "../assets/icons/LightIcon.svelte";
-import settings from "../models/Settings.svelte";
+  import DarkIcon from "../assets/icons/DarkIcon.svelte";
+  import LightIcon from "../assets/icons/LightIcon.svelte";
+  import settings from "../models/Settings.svelte";
 
-let { settingsDialog = $bindable() } = $props();
+  let { settingsDialog = $bindable() } = $props();
 </script>
 
 <dialog
   bind:this={settingsDialog}
   class="w-md h-md absolute inset-auto bg-secondary"
+  onclick={(e) => {
+    if (e.target === settingsDialog) {
+      settingsDialog.close();
+    }
+  }}
 >
   <div class="flex flex-col p-4">
     <h1 class="text-3xl">Settings</h1>

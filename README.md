@@ -100,6 +100,8 @@ If you need to reach out directly, my email and LinkedIn can be found on my [Git
     - [x] Visual stimuli
     - [ ] Audio stimuli
 - [ ] Settings Modal
+    - [x] On click outside modal close
+    - [ ] Insert settings for N value
 - [x] Icons
 - [x] fix bug where the game doesn't display letters after it is stopped -> fixed by adding new AbortController
 - [x] grid reset on stop
