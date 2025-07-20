@@ -1,14 +1,15 @@
 <script lang="ts">
-  import DarkIcon from "../assets/icons/DarkIcon.svelte";
-  import LightIcon from "../assets/icons/LightIcon.svelte";
-  import settings from "../models/Settings.svelte";
+import DarkIcon from "../assets/icons/DarkIcon.svelte";
+import LightIcon from "../assets/icons/LightIcon.svelte";
+import gameLogic from "../logic/GameLogic.svelte";
+import settings from "../models/Settings.svelte";
 
-  let { settingsDialog = $bindable() } = $props();
+let { settingsDialog = $bindable() } = $props();
 </script>
 
 <dialog
   bind:this={settingsDialog}
-  class="w-md h-md absolute inset-auto bg-secondary"
+  class="w-lg h-md absolute inset-auto bg-secondary"
   onclick={(e) => {
     if (e.target === settingsDialog) {
       settingsDialog.close();
@@ -45,20 +46,96 @@
         </button>
       </div>
 
-      <label class="text-lg">
-        Visual Stimulus Key Binding:
+      <label class="flex justify-between items-center text-lg">
+        <span class="w-60">Visual Stimulus Key Binding:</span>
         <input
           type="text"
           bind:value={settings.visualStimulusKeyBinding}
-          class="input input-bordered w-full"
+          class="input input-bordered w-24"
         />
       </label>
-      <label class="text-lg">
-        Auditory Stimulus Key Binding:
+
+      <label class="flex justify-between items-center text-lg">
+        <span class="w-60">Auditory Stimulus Key Binding:</span>
         <input
           type="text"
           bind:value={settings.auditoryStimulusKeyBinding}
-          class="input input-bordered w-full"
+          class="input input-bordered w-24"
+        />
+      </label>
+
+      <h1 class="text-xl mt-4 pt-3 border-t">Game Logic Settings:</h1>
+
+      <label class="flex justify-between items-center text-lg">
+        <span class="w-60">Stimuli duration (ms):</span>
+        <input
+          type="number"
+          bind:value={gameLogic.stimuliDuration}
+          class="input input-bordered w-24"
+        />
+      </label>
+
+      <label class="flex justify-between items-center text-lg">
+        <span class="w-60">Pause between stimuli (ms):</span>
+        <input
+          type="number"
+          bind:value={gameLogic.pauseBetweenStimuli}
+          class="input input-bordered w-24"
+        />
+      </label>
+
+      <label class="flex justify-between items-center text-lg">
+        <span class="w-60">N-Back Level:</span>
+        <input
+          type="number"
+          bind:value={gameLogic.nBackLevel}
+          class="input input-bordered w-24"
+        />
+      </label>
+
+      <label class="flex justify-between items-center text-lg">
+        <span class="w-60">Current Set:</span>
+        <input
+          type="number"
+          bind:value={gameLogic.currentSet}
+          class="input input-bordered w-24"
+        />
+      </label>
+
+      <label class="flex justify-between items-center text-lg">
+        <span class="w-60">Total Sets:</span>
+        <input
+          type="number"
+          bind:value={gameLogic.setNumber}
+          class="input input-bordered w-24"
+        />
+      </label>
+
+      <label class="flex justify-between items-center text-lg">
+        <span class="w-60">Trial Number:</span>
+        <input
+          type="number"
+          bind:value={gameLogic.trialNumber}
+          class="input input-bordered w-24"
+        />
+      </label>
+
+      <label class="flex justify-between items-center text-lg">
+        <span class="w-60">Matches:</span>
+        <input
+          type="number"
+          bind:value={gameLogic.matches}
+          class="input input-bordered w-24"
+        />
+      </label>
+
+      <label class="flex justify-between items-center text-lg">
+        <span class="w-60">Randomness (0-1):</span>
+        <input
+          type="number"
+          step="0.01"
+          bind:value={gameLogic.randomness}
+          class="input input-bordered w-24"
         />
       </label>
     </div>

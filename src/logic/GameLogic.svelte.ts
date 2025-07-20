@@ -13,7 +13,9 @@ class GameLogic {
   trialNumber: number = $state(0);
   matches: number = $state(6);
   randomness: number = $state(0.35);
-  // derived from reference [1]
+  /**
+   * derived from reference [1]
+   */
   lettersUsed: string[] = $state([
     "b",
     "c",
