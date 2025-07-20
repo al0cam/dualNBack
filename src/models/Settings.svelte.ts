@@ -1,3 +1,49 @@
+interface Setting {
+  id: string;
+  label: string;
+  type: "text" | "select" | "checkbox";
+  min?: number;
+  max?: number;
+  step?: number;
+  unit?: string;
+  options?: string[]; // For select type
+  defaultValue?: string | number | boolean;
+}
+
+interface SettingCategory {
+  id: string;
+  label: string;
+  settings: Setting[];
+}
+
+let variables: SettingCategory[] = [
+  {
+    id: "general",
+    label: "General Settings",
+    settings: [
+      {
+        id: "theme",
+        label: "Theme",
+        type: "select",
+        defaultValue: "dracula",
+        options: ["cupcake", "dracula"],
+      },
+      {
+        id: "visualStimulusKeyBinding",
+        label: "Visual Stimulus Key Binding",
+        type: "text",
+        defaultValue: "a",
+      },
+      {
+        id: "auditoryStimulusKeyBinding",
+        label: "Auditory Stimulus Key Binding",
+        type: "text",
+        defaultValue: "l",
+      },
+    ],
+  },
+];
+
 class Settings {
   private static instance: Settings;
 
