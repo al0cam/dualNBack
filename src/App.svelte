@@ -12,6 +12,7 @@ onMount(() => {
   // Load theme from localStorage
   settings.theme = localStorage.getItem("theme") || "light";
   document.documentElement.setAttribute("data-theme", settings.theme);
+  settingsDialog?.showModal();
 });
 onDestroy(() => {
   window.removeEventListener("keydown", keyPressed);

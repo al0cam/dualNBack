@@ -1,48 +1,35 @@
-interface Setting {
+class Setting {
   id: string;
-  label: string;
   type: "text" | "select" | "checkbox";
   min?: number;
   max?: number;
   step?: number;
   unit?: string;
-  options?: string[]; // For select type
+  options?: string[];
   defaultValue?: string | number | boolean;
+
+  // this way, language changes can be reflected in the UI reactively
+  label: string = $state("");
+  value?: string | number | boolean = $state("");
+
+  constructor(id: string, label: string) {
+    this.id = id;
+    this.label = label;
+    this.type = "text"; // Default type
+  }
 }
 
-interface SettingCategory {
+class SettingCategory {
   id: string;
-  label: string;
+  label: string = $state("");
   settings: Setting[];
-}
 
-let variables: SettingCategory[] = [
-  {
-    id: "general",
-    label: "General Settings",
-    settings: [
-      {
-        id: "theme",
-        label: "Theme",
-        type: "select",
-        defaultValue: "dracula",
-        options: ["cupcake", "dracula"],
-      },
-      {
-        id: "visualStimulusKeyBinding",
-        label: "Visual Stimulus Key Binding",
-        type: "text",
-        defaultValue: "a",
-      },
-      {
-        id: "auditoryStimulusKeyBinding",
-        label: "Auditory Stimulus Key Binding",
-        type: "text",
-        defaultValue: "l",
-      },
-    ],
-  },
-];
+  constructor(id: string, label: string) {
+    this.id = id;
+    this.label = label;
+    this.settings = [];
+  }
+}
 
 class Settings {
   private static instance: Settings;
