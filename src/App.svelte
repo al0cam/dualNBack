@@ -1,66 +1,64 @@
 <script lang="ts">
-import { onDestroy, onMount } from "svelte";
-import SettingsIcon from "./assets/icons/SettingsIcon.svelte";
-import GridItem from "./components/GridItem.svelte";
-import SettingsDialog from "./components/SettingsDialog.svelte";
-import gameLogic from "./logic/GameLogic.svelte";
-import settings from "./models/Settings.svelte";
+  import { onDestroy, onMount } from "svelte";
+  import SettingsIcon from "./assets/icons/SettingsIcon.svelte";
+  import GridItem from "./components/GridItem.svelte";
+  import SettingsDialog from "./components/SettingsDialog.svelte";
+  import gameLogic from "./logic/GameLogic.svelte";
+  import settings from "./models/Settings.svelte";
 
-onMount(() => {
-  window.addEventListener("keydown", keyPressed);
+  onMount(() => {
+    window.addEventListener("keydown", keyPressed);
 
-  // Load theme from localStorage
-  settings.theme = localStorage.getItem("theme") || "light";
-  document.documentElement.setAttribute("data-theme", settings.theme);
-  settingsDialog?.showModal();
-});
-onDestroy(() => {
-  window.removeEventListener("keydown", keyPressed);
-});
+    // settingsDialog?.showModal();
+  });
+  onDestroy(() => {
+    window.removeEventListener("keydown", keyPressed);
+  });
 
-let settingsDialog: HTMLDialogElement | undefined = $state();
-let visualStiumulusButton: HTMLButtonElement;
-let auditoryStiumulusButton: HTMLButtonElement;
-const gridItems = $state(Array(9).fill(null));
+  let settingsDialog: HTMLDialogElement | undefined = $state();
+  let visualStiumulusButton: HTMLButtonElement;
+  let auditoryStiumulusButton: HTMLButtonElement;
+  const gridItems = $state(Array(9).fill(null));
 
-function keyPressed(event: KeyboardEvent) {
-  if (
-    event.key.toUpperCase() === settings.visualStimulusKeyBinding.toUpperCase()
-  ) {
-    event.preventDefault();
-    visualStiumulusButton.click();
-  } else if (
-    event.key.toUpperCase() ===
-    settings.auditoryStimulusKeyBinding.toUpperCase()
-  ) {
-    event.preventDefault();
-    auditoryStiumulusButton.click();
+  function keyPressed(event: KeyboardEvent) {
+    if (
+      event.key.toUpperCase() ===
+      settings.visualStimulusKeyBinding.toUpperCase()
+    ) {
+      event.preventDefault();
+      visualStiumulusButton.click();
+    } else if (
+      event.key.toUpperCase() ===
+      settings.auditoryStimulusKeyBinding.toUpperCase()
+    ) {
+      event.preventDefault();
+      auditoryStiumulusButton.click();
+    }
   }
-}
 
-function visualStimulus(): void {
-  visualStiumulusButton.classList.add("bg-green-500", "animate-ping");
-  console.log("Visual Stimulus");
-  setTimeout(() => {
-    visualStiumulusButton.classList.remove("bg-green-500", "animate-ping");
-  }, 1000);
-}
-function auditoryStimulus() {
-  auditoryStiumulusButton.classList.add("bg-green-500", "animate-ping");
-  console.log("Auditory Stimulus");
-  setTimeout(() => {
-    auditoryStiumulusButton.classList.remove("bg-green-500", "animate-ping");
-  }, 1000);
-}
-
-function startStop() {
-  gameLogic.isGameStarted = !gameLogic.isGameStarted;
-  if (gameLogic.isGameStarted) {
-    gameLogic.startGame(gridItems);
-  } else {
-    gameLogic.stopGame(gridItems);
+  function visualStimulus(): void {
+    visualStiumulusButton.classList.add("bg-green-500", "animate-ping");
+    console.log("Visual Stimulus");
+    setTimeout(() => {
+      visualStiumulusButton.classList.remove("bg-green-500", "animate-ping");
+    }, 1000);
   }
-}
+  function auditoryStimulus() {
+    auditoryStiumulusButton.classList.add("bg-green-500", "animate-ping");
+    console.log("Auditory Stimulus");
+    setTimeout(() => {
+      auditoryStiumulusButton.classList.remove("bg-green-500", "animate-ping");
+    }, 1000);
+  }
+
+  function startStop() {
+    gameLogic.isGameStarted = !gameLogic.isGameStarted;
+    if (gameLogic.isGameStarted) {
+      gameLogic.startGame(gridItems);
+    } else {
+      gameLogic.stopGame(gridItems);
+    }
+  }
 </script>
 
 <main

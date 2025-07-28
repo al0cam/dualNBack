@@ -33,10 +33,58 @@ class GameLogic {
 
   abortController: AbortController = new AbortController();
 
-  // Define the valid positions (excluding center)
   private readonly VALID_POSITIONS: number[] = [0, 1, 2, 3, 5, 6, 7, 8];
 
-  private constructor() { }
+  private constructor() {
+    this.loadSettings();
+  }
+
+  private loadSettings() {
+    if (typeof window !== "undefined") {
+      const savedSettings = localStorage.getItem("gameSettings");
+      if (savedSettings) {
+        try {
+          const parsedSettings = JSON.parse(savedSettings);
+          if (parsedSettings.stimuliDuration !== undefined)
+            this.stimuliDuration = parsedSettings.stimuliDuration;
+          if (parsedSettings.pauseBetweenStimuli !== undefined)
+            this.pauseBetweenStimuli = parsedSettings.pauseBetweenStimuli;
+          if (parsedSettings.nBackLevel !== undefined)
+            this.nBackLevel = parsedSettings.nBackLevel;
+          if (parsedSettings.currentSet !== undefined)
+            this.currentSet = parsedSettings.currentSet;
+          if (parsedSettings.setNumber !== undefined)
+            this.setNumber = parsedSettings.setNumber;
+          if (parsedSettings.trialNumber !== undefined)
+            this.trialNumber = parsedSettings.trialNumber;
+          if (parsedSettings.matches !== undefined)
+            this.matches = parsedSettings.matches;
+          if (parsedSettings.randomness !== undefined)
+            this.randomness = parsedSettings.randomness;
+          console.log("Game settings loaded:", parsedSettings);
+        } catch (e) {
+          console.error("Failed to parse game settings from localStorage", e);
+        }
+      }
+    }
+  }
+
+  public saveSettings() {
+    if (typeof window !== "undefined") {
+      const settingsToSave = {
+        stimuliDuration: this.stimuliDuration,
+        pauseBetweenStimuli: this.pauseBetweenStimuli,
+        nBackLevel: this.nBackLevel,
+        currentSet: this.currentSet,
+        setNumber: this.setNumber,
+        trialNumber: this.trialNumber,
+        matches: this.matches,
+        randomness: this.randomness,
+      };
+      localStorage.setItem("gameSettings", JSON.stringify(settingsToSave));
+      console.log("Game settings saved manually:", settingsToSave);
+    }
+  }
 
   public static getInstance(): GameLogic {
     if (!GameLogic.instance) {

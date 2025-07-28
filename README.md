@@ -99,10 +99,11 @@ If you need to reach out directly, my email and LinkedIn can be found on my [Git
     - [x] Sequence generation
     - [x] Visual stimuli
     - [ ] Audio stimuli
-- [ ] Settings Modal
+- [x] Settings Modal
     - [x] On click outside modal close
     - [x] Insert settings for N value
-    - [ ] Rework settings to use a more resilient solution -> to generate UI code and to add less when updating or changing code -> svelte is not deeply reactive therefore I need to use OOP
+    - [ ] ~Rework settings to use a more resilient solution -> to generate UI code and to add less when updating or changing code -> svelte is not deeply reactive therefore I need to use OOP~ reworking settings is too much complication for this small app
+    - [ ] save settings to local storage
 - [x] Icons
 - [x] fix bug where the game doesn't display letters after it is stopped -> fixed by adding new AbortController
 - [x] grid reset on stop
@@ -113,6 +114,7 @@ If you need to reach out directly, my email and LinkedIn can be found on my [Git
 - [ ] Reactive
 - [ ] Button instant feedback if the response was correct or not
 - [ ] Button pulse animation
+- [ ] Translation support
 
 
 ### Mobile release

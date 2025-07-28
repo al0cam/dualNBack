@@ -1,44 +1,52 @@
-class Setting {
-  id: string;
-  type: "text" | "select" | "checkbox";
-  min?: number;
-  max?: number;
-  step?: number;
-  unit?: string;
-  options?: string[];
-  defaultValue?: string | number | boolean;
-
-  // this way, language changes can be reflected in the UI reactively
-  label: string = $state("");
-  value?: string | number | boolean = $state("");
-
-  constructor(id: string, label: string) {
-    this.id = id;
-    this.label = label;
-    this.type = "text"; // Default type
-  }
-}
-
-class SettingCategory {
-  id: string;
-  label: string = $state("");
-  settings: Setting[];
-
-  constructor(id: string, label: string) {
-    this.id = id;
-    this.label = label;
-    this.settings = [];
-  }
-}
-
 class Settings {
   private static instance: Settings;
 
+  //General settings
   theme: string = $state("dracula");
   visualStimulusKeyBinding: string = $state("a");
   auditoryStimulusKeyBinding: string = $state("l");
 
-  private constructor() { }
+  private constructor() {
+    this.loadSettings();
+  }
+
+  private loadSettings() {
+    if (typeof window !== "undefined") {
+      console.log("Loading app settings from localStorage");
+      const savedSettings = localStorage.getItem("appSettings");
+      if (savedSettings) {
+        try {
+          const parsedSettings = JSON.parse(savedSettings);
+          if (parsedSettings.theme !== undefined) {
+            this.theme = parsedSettings.theme;
+            console.log("Theme loaded from settings:", this.theme);
+          }
+
+          if (parsedSettings.visualStimulusKeyBinding !== undefined)
+            this.visualStimulusKeyBinding =
+              parsedSettings.visualStimulusKeyBinding;
+          if (parsedSettings.auditoryStimulusKeyBinding !== undefined)
+            this.auditoryStimulusKeyBinding =
+              parsedSettings.auditoryStimulusKeyBinding;
+          console.log("App settings loaded:", parsedSettings);
+        } catch (e) {
+          console.error("Failed to parse app settings from localStorage", e);
+        }
+      }
+    }
+  }
+
+  public saveSettings() {
+    if (typeof window !== "undefined") {
+      const settingsToSave = {
+        theme: this.theme,
+        visualStimulusKeyBinding: this.visualStimulusKeyBinding,
+        auditoryStimulusKeyBinding: this.auditoryStimulusKeyBinding,
+      };
+      localStorage.setItem("appSettings", JSON.stringify(settingsToSave));
+      console.log("App settings saved manually:", settingsToSave);
+    }
+  }
 
   public static getInstance(): Settings {
     if (!Settings.instance) {
@@ -49,9 +57,6 @@ class Settings {
 
   public toggleTheme() {
     this.theme = this.theme === "cupcake" ? "dracula" : "cupcake";
-    console.log("Theme changed to:", this.theme);
-    document.documentElement.setAttribute("data-theme", this.theme);
-    localStorage.setItem("theme", this.theme);
   }
 }
 

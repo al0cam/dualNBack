@@ -1,10 +1,47 @@
 <script lang="ts">
-import DarkIcon from "../assets/icons/DarkIcon.svelte";
-import LightIcon from "../assets/icons/LightIcon.svelte";
-import gameLogic from "../logic/GameLogic.svelte";
-import settings from "../models/Settings.svelte";
+  import DarkIcon from "../assets/icons/DarkIcon.svelte";
+  import LightIcon from "../assets/icons/LightIcon.svelte";
+  import gameLogic from "../logic/GameLogic.svelte";
+  import settings from "../models/Settings.svelte";
 
-let { settingsDialog = $bindable() } = $props();
+  let { settingsDialog = $bindable() } = $props();
+
+  $effect(() => {
+    const settingsToSave = {
+      stimuliDuration: gameLogic.stimuliDuration,
+      pauseBetweenStimuli: gameLogic.pauseBetweenStimuli,
+      nBackLevel: gameLogic.nBackLevel,
+      currentSet: gameLogic.currentSet,
+      setNumber: gameLogic.setNumber,
+      trialNumber: gameLogic.trialNumber,
+      matches: gameLogic.matches,
+      randomness: gameLogic.randomness,
+    };
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("gameSettings", JSON.stringify(settingsToSave));
+      console.log("Game settings saved by Svelte effect:", settingsToSave);
+    }
+  });
+
+  $effect(() => {
+    const settingsToSave = {
+      theme: settings.theme,
+      visualStimulusKeyBinding: settings.visualStimulusKeyBinding,
+      auditoryStimulusKeyBinding: settings.auditoryStimulusKeyBinding,
+    };
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem("appSettings", JSON.stringify(settingsToSave));
+      console.log("App settings saved by Svelte effect:", settingsToSave);
+    }
+  });
+
+  $effect(() => {
+    if (typeof document !== "undefined") {
+      document.documentElement.setAttribute("data-theme", settings.theme);
+    }
+  });
 </script>
 
 <dialog
