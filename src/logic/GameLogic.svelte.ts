@@ -13,6 +13,7 @@ class GameLogic {
   trialNumber: number = $state(0);
   matches: number = $state(6);
   randomness: number = $state(0.35);
+
   /**
    * derived from reference [1]
    */
@@ -33,6 +34,7 @@ class GameLogic {
 
   abortController: AbortController = new AbortController();
 
+  // used to validate positions in the grid
   private readonly VALID_POSITIONS: number[] = [0, 1, 2, 3, 5, 6, 7, 8];
 
   private constructor() {
