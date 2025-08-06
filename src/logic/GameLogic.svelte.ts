@@ -1,5 +1,6 @@
 import type { StimuliSequence } from "../types/StimuliSequence";
 import type { Stimulus } from "../types/Stimulus";
+import audioService from "./AudioService.svelte";
 
 class GameLogic {
   private static instance: GameLogic;
@@ -39,6 +40,13 @@ class GameLogic {
 
   private constructor() {
     this.loadSettings();
+  }
+
+  public static getInstance(): GameLogic {
+    if (!GameLogic.instance) {
+      GameLogic.instance = new GameLogic();
+    }
+    return GameLogic.instance;
   }
 
   private loadSettings() {
@@ -86,13 +94,6 @@ class GameLogic {
       localStorage.setItem("gameSettings", JSON.stringify(settingsToSave));
       console.log("Game settings saved manually:", settingsToSave);
     }
-  }
-
-  public static getInstance(): GameLogic {
-    if (!GameLogic.instance) {
-      GameLogic.instance = new GameLogic();
-    }
-    return GameLogic.instance;
   }
 
   /**
@@ -429,6 +430,7 @@ class GameLogic {
     for (let i = 0; i < sequence.length; i++) {
       console.log("Step:", i);
       const gridIndex = this.positionToGridIndex(sequence[i].position);
+      audioService.playSound(sequence[i].letter, "nato");
 
       gridItems[gridIndex].classList.add("bg-orange-500");
       await this.wait(stimuliDuration, abortController.signal);
